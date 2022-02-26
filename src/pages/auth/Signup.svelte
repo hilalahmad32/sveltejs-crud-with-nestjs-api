@@ -4,6 +4,9 @@
     let name = "";
     let email = "";
     let password = "";
+    let isLoading=false;
+    let disabled=false;
+
 
     let error = "";
     let errorStatus = true;
@@ -19,6 +22,8 @@
                 email: email,
                 password: password,
             };
+            isLoading=true;
+            disabled=true;
             const res = await fetch("https://nestjs-crud-api.herokuapp.com/auth/signup", {
                 method: "POST",
                 body: JSON.stringify(data),
@@ -26,6 +31,8 @@
             });
             const output = await res.json();
             if (output.success) {
+                isLoading=false;
+                disabled=false;
                 error = output.msg;
                 errorStatus = true;
                 setTimeout(() => {
@@ -35,6 +42,8 @@
                 email = "";
                 password = "";
             } else {
+                isLoading=false;
+                disabled=false;
                 error = output.msg;
                 errorStatus = false;
             }
@@ -88,7 +97,7 @@
                                 />
                             </div>
                             <div class="mb-3">
-                                <button class="btn btn-success">Signup</button>
+                                <button class="btn btn-success" {disabled}>{isLoading ? 'Signup....':"Signup"}</button>
                             </div>
                         </form>
                     </div>

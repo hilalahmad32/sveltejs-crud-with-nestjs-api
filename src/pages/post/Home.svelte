@@ -5,6 +5,8 @@
 
     let tokens;
     let products = [];
+    let isLoading=false;
+    let disabled=false;
     token.subscribe((val) => {
         tokens = val;
     });
@@ -12,7 +14,7 @@
     let error = "";
     let errorStatus = true;
     const getUser = async () => {
-        const res = await fetch("https://nestjs-crud-api.herokuapp.com/auth/me", {
+           const res = await fetch("https://nestjs-crud-api.herokuapp.com/auth/me", {
             method: "GET",
             headers: {
                 Authorization: "Bearer " + tokens,
@@ -22,6 +24,7 @@
         username = output.name;
     };
     const getProduct = async () => {
+    isLoading=true;
         const res = await fetch("https://nestjs-crud-api.herokuapp.com/product/products", {
             method: "GET",
             headers: {
@@ -30,6 +33,7 @@
         });
         const output = await res.json();
         if (output.success) {
+        isLoading=false;
             products = output.products;
         } else {
             error = output.msg;
@@ -39,8 +43,10 @@
 
     const deleteProduct = async (id) => {
         if (confirm("Are you sure you want to delete product")) {
+        isLoading=true;
+        disabled=true;
             const res = await fetch(
-                `http://localhost:3000/product/products/${id}`,
+                `https://nestjs-crud-api.herokuapp.com/product/products/${id}`,
                 {
                     method: "DELETE",
                     headers: {
@@ -50,12 +56,16 @@
             );
             const output = await res.json();
             if (output.success) {
+            isLoading=false;
                 error = output.msg;
                 errorStatus = true;
+                disabled=false;
                 getProduct();
             } else {
+            isLoading=false;
                 error = output.msg;
                 errorStatus = false;
+                disabled=false;
             }
         }
     };
@@ -93,6 +103,9 @@
         </div>
         {#if $token}
             <div class="table-responsive my-4">
+             {#if isLoading}
+                        <h4 class="text-center">Loading.....</h4>
+             {:else}
                 {#if products.length > 0}
                     <table class="table table-bordered">
                         <thead>
@@ -105,7 +118,7 @@
                                 <th>Edit</th>
                                 <th>Delete</th>
                             </tr>
-                        </thead>
+                        </thead>                   
                         <tbody>
                             {#each products as product, index}
                                 <tr>
@@ -125,17 +138,20 @@
                                             on:click={() => {
                                                 deleteProduct(product._id);
                                             }}
-                                            class="btn btn-danger"
-                                            >Delete</button
+                                            class="btn btn-danger" {disabled}
+                                            >{isLoading ? 'Delete....':'Delete'}</button
                                         >
                                     </td>
                                 </tr>
                             {/each}
                         </tbody>
+
                     </table>
                 {:else}
                     <h3>Record Not Found</h3>
                 {/if}
+        {/if}
+
             </div>
         {/if}
     </div>

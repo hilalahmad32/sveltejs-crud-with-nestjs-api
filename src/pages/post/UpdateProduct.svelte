@@ -8,8 +8,12 @@
     let price = "";
     let error = "";
     let errorStatus = true;
+        let isLoading=false;
+    let disabled=false;
 
     const getProduct = async () => {
+        isLoading=true;
+
         const res = await fetch(
             `https://nestjs-crud-api.herokuapp.com/product/products/${params.id}`,
             {
@@ -22,8 +26,10 @@
             title = output.products.title;
             content = output.products.content;
             price = output.products.price;
+            isLoading=false;
         } else {
             alert(output.msg);
+            isLoading=false;
         }
     };
 
@@ -42,8 +48,10 @@
                 content: content,
                 price: price,
             };
+            isLoading=true;
+            disabled=true;
             const res = await fetch(
-                `http://localhost:3000/product/products/${params.id}`,
+                `https://nestjs-crud-api.herokuapp.com/product/products/${params.id}`,
                 {
                     method: "PATCH",
                     body: JSON.stringify(data),
@@ -60,9 +68,13 @@
                 title = "";
                 content = "";
                 price = "";
+                 isLoading=false;
+            disabled=false;
             } else {
                 error = output.msg;
                 errorStatus = false;
+                 isLoading=false;
+            disabled=false;
             }
         }
     };
@@ -79,6 +91,10 @@
                         <h3>Update Post Form</h3>
                     </div>
                     <div class="card-body">
+                    {#if isLoading}
+                    <h3 class="text-center"> Loading.....</h3>
+                        {/if}
+                    
                         <form action="" on:submit={update}>
                             {#if error}
                                 <div
@@ -114,7 +130,7 @@
                                 />
                             </div>
                             <div class="mb-3">
-                                <button class="btn btn-success">Update</button>
+                                <button class="btn btn-success" {disabled}>{isLoading ? "Update...":"Update"}</button>
                             </div>
                         </form>
                     </div>

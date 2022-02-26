@@ -9,6 +9,8 @@
     let price = "";
     let error = "";
     let errorStatus = true;
+     let isLoading=false;
+    let disabled=false;
 
     token.subscribe((val) => {
         tokens = val;
@@ -25,6 +27,8 @@
                 content: content,
                 price: price,
             };
+            isLoading=true;
+            disabled=true;
             const res = await fetch("https://nestjs-crud-api.herokuapp.com/product/products", {
                 method: "POST",
                 body: JSON.stringify(data),
@@ -43,9 +47,13 @@
                 title = "";
                 content = "";
                 price = "";
+                isLoading=false;
+            disabled=false;
             } else {
                 error = output.msg;
                 errorStatus = false;
+                isLoading=false;
+            disabled=false;
             }
         }
     };
@@ -97,7 +105,7 @@
                                 />
                             </div>
                             <div class="mb-3">
-                                <button class="btn btn-success">Save</button>
+                                <button class="btn btn-success" {disabled}>{isLoading ? "Save...":"Save"}</button>
                             </div>
                         </form>
                     </div>
